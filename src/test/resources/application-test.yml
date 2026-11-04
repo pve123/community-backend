@@ -1,0 +1,5 @@
+# DB 접속 정보는 Testcontainers(@ServiceConnection)가 넣어 줍니다. 아래 값은 자리만 채웁니다.
+spring:
+  datasource:
+    username: provided-by-testcontainers
+    password: provided-by-testcontainers

@@ -1,18 +1,15 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    //querydsl 추가
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'org.springframework.boot' version '4.1.2'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+group = 'io.github.pve123'
+version = '1.0.0'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -20,82 +17,59 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    querydslVersion = '7.7'
+    jjwtVersion = '0.13.0'
+    springdocVersion = '3.2.0'
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'junit:junit:4.12'
+    // 웹 · 검증 · 문서
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+
+    // 보안 · 토큰
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // 저장소
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
+    implementation 'org.flywaydb:flyway-mysql'
+    implementation "io.github.openfeign.querydsl:querydsl-jpa:${querydslVersion}"
+    annotationProcessor "io.github.openfeign.querydsl:querydsl-apt:${querydslVersion}:jpa"
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // 메일
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.29'
-    // Hibernate
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    //querydsl
-    implementation 'com.querydsl:querydsl-jpa'
-    //swagger
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-
-    //oauth2.0
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation 'org.springframework.security:spring-security-test'
-
-
-    //mailsender
-    implementation 'org.springframework.boot:spring-boot-starter-mail:2.6.3'
-
-
-    //redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework:spring-aop'
-
-    //jasypt
-    implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.3'
-
-    //thymeleaf
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-    //OAuth2.0
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-
-    //JWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
-
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '2.7.2'
-
-
-
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-mysql'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-//querydsl 추가 시작
-def querydslDir = "$buildDir/generated/querydsl"
-
-querydsl {
-    jpa = true
-    querydslSourcesDir = querydslDir
+tasks.named('bootJar') {
+    archiveFileName = 'app.jar'
 }
 
-sourceSets {
-    main.java.srcDir querydslDir
-}
-
-configurations {
-    querydsl.extendsFrom compileClasspath
-}
-
-compileQuerydsl {
-    options.annotationProcessorPath = configurations.querydsl
-}
-//querydsl 추가 끝
-bootJar {
-    layered()
+tasks.named('jar') {
+    enabled = false
 }

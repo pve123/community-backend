@@ -1,36 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>SNS Test</title>
+    <title>소셜 로그인</title>
+    <style>
+        img { width: 350px; height: 50px; }
+    </style>
 </head>
-
-<style>
-
-    img{
-        width: 350px;
-        height: 50px;
-        margin-left: auto;
-    }
-</style>
 <body>
-<h2>SNS LOGIN</h2><br/><br/>
-<a href="javascript:;" class="btn_social" data-social="facebook" id="facebook">페이스북 로그인(미구현)</a><br/>
-<a href="javascript:;" class="btn_social" data-social="google"><img src="images/google.png"></a><br/>
-<a href="javascript:;" class="btn_social" data-social="kakao"><img src="images/kakao.png"></a><br/>
-<a href="javascript:;" class="btn_social" data-social="naver"><img src="images/naver.png"></a><br/>
-
-
+<h2>소셜 로그인</h2>
+<p><a th:href="@{/oauth2/authorization/google}"><img th:src="@{/images/google.png}" alt="구글로 로그인"></a></p>
+<p><a th:href="@{/oauth2/authorization/kakao}"><img th:src="@{/images/kakao.png}" alt="카카오로 로그인"></a></p>
+<p><a th:href="@{/oauth2/authorization/naver}"><img th:src="@{/images/naver.png}" alt="네이버로 로그인"></a></p>
 </body>
-<script>
-    let socials = document.getElementsByClassName("btn_social");
-
-    for (let social of socials) {
-        social.addEventListener('click', function () {
-            let socialType = this.getAttribute('data-social');
-            location.href = "/oauth2/authorization/" + socialType;
-            console.log(location.href)
-        })
-    }
-</script>
 </html>

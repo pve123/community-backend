@@ -1,0 +1,28 @@
+# 로컬 개발용 MySQL, Redis, 메일 확인용 SMTP(Mailpit)를 띄웁니다.
+# 값은 .env 파일에서 읽습니다. 처음이라면: cp .env.example .env 후 빈칸을 채우세요.
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: tech_poc
+      MYSQL_USER: ${DB_USERNAME:?DB_USERNAME을 .env에 적어 주세요}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD를 .env에 적어 주세요}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD를 .env에 적어 주세요}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+  # 비밀번호 재설정 메일을 실제로 보내지 않고 http://localhost:8025 에서 확인합니다.
+  mailpit:
+    image: axllent/mailpit:v1.33
+    ports:
+      - "${MAIL_PORT:-1025}:1025"
+      - "8025:8025"
